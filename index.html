@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML & JavaScript — Live Demo</title>
+<style>
+  :root{
+    --ink:#0f172a;
+    --slate:#1e293b;
+    --slate2:#0f172a;
+    --paper:#ffffff;
+    --card:#f1f5f9;
+    --line:#e2e8f0;
+    --mute:#64748b;
+    --amber:#f59e0b;
+    --cyan:#22d3ee;
+    --green:#34d399;
+    --pink:#f472b6;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:'Segoe UI', Calibri, Arial, sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.5;
+  }
+  code, pre, .mono{ font-family:'Consolas','Courier New',monospace; }
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:var(--slate);
+    color:#fff;
+    padding:64px 24px 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(180deg, rgba(15,23,42,0) 0%, rgba(15,23,42,1) 100%);
+    pointer-events:none;
+  }
+  .hero-inner{ max-width:920px; margin:0 auto; position:relative; z-index:1; }
+  .eyebrow{ color:var(--amber); font-weight:700; letter-spacing:2px; font-size:13px; text-transform:uppercase; }
+  h1.title{ font-size:38px; margin:10px 0 8px; }
+  .subtitle{ color:#cbd5e1; font-size:16px; max-width:640px; }
+
+  nav.pills{
+    max-width:920px; margin:28px auto 0;
+    display:flex; flex-wrap:wrap; gap:8px;
+  }
+  nav.pills a{
+    color:#e2e8f0; text-decoration:none; font-size:13px;
+    padding:7px 14px; border-radius:999px;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.12);
+    transition:background .15s ease;
+  }
+  nav.pills a:hover{ background:rgba(245,158,11,0.18); border-color:var(--amber); }
+
+  main{ max-width:920px; margin:0 auto; padding:8px 24px 80px; }
+
+  section.demo{ padding:52px 0; border-bottom:1px solid var(--line); }
+  section.demo:last-of-type{ border-bottom:none; }
+
+  .kicker{ color:var(--amber); font-weight:700; font-size:12px; letter-spacing:2px; text-transform:uppercase; }
+  h2{ font-size:25px; margin:6px 0 10px; }
+  .desc{ color:#334155; font-size:14.5px; max-width:640px; margin-bottom:22px; }
+
+  .grid{ display:flex; flex-wrap:wrap; gap:20px; }
+  .grid > *{ flex:1 1 380px; min-width:0; }
+
+  /* ---------- code box ---------- */
+  .code-box{
+    background:var(--slate2);
+    border:1px solid #334155;
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .code-box .bar{
+    display:flex; align-items:center; gap:6px;
+    padding:9px 12px; border-bottom:1px solid #1f2c42;
+  }
+  .code-box .bar span{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .code-box .bar .r{ background:#f87171; } .code-box .bar .y{ background:#fbbf24; } .code-box .bar .g{ background:#34d399; }
+  .code-box .bar .label{ margin-left:auto; color:#64748b; font-size:11px; }
+  .code-box pre{ margin:0; padding:16px; font-size:12.5px; color:#e2e8f0; overflow-x:auto; line-height:1.6; }
+  .code-box .kw{ color:var(--pink); } .code-box .tag{ color:var(--amber); } .code-box .str{ color:var(--green); }
+  .code-box .attr{ color:var(--cyan); } .code-box .cmt{ color:#64748b; }
+
+  /* ---------- demo panel ---------- */
+  .panel{
+    background:var(--card);
+    border-radius:10px;
+    padding:18px 20px;
+    display:flex; flex-direction:column;
+    gap:12px;
+  }
+  .panel h4{ margin:0; font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--mute); }
+
+  button.btn{
+    font-family:inherit; font-size:13.5px; font-weight:600;
+    padding:9px 16px; border-radius:7px; border:none;
+    background:var(--amber); color:#1e293b; cursor:pointer;
+    transition:transform .1s ease, background .15s ease;
+  }
+  button.btn:hover{ background:#fbbf24; }
+  button.btn:active{ transform:scale(0.97); }
+  button.btn.secondary{ background:#e2e8f0; color:#334155; }
+  button.btn.secondary:hover{ background:#cbd5e1; }
+
+  input.field{
+    font-family:inherit; font-size:13.5px; padding:9px 12px;
+    border-radius:7px; border:1px solid #cbd5e1; width:100%;
+  }
+  label.field-label{ font-size:12px; color:var(--mute); font-weight:600; display:block; margin-bottom:4px; }
+
+  /* console-style output */
+  .console{
+    background:var(--slate2); border-radius:8px; padding:12px 14px;
+    color:#e2e8f0; font-size:12.5px; min-height:52px;
+    max-height:220px; overflow-y:auto;
+  }
+  .console .line{ padding:2px 0; border-bottom:1px dashed #1f2c42; }
+  .console .line:last-child{ border-bottom:none; }
+  .console .arrow{ color:var(--amber); }
+  .console .empty{ color:#475569; font-style:italic; }
+
+  /* semantic map */
+  .sem-map{ display:flex; flex-direction:column; gap:6px; }
+  .sem-block{ border:2px dashed; border-radius:8px; padding:10px 12px; font-size:12.5px; }
+  .sem-block b{ font-family:'Consolas',monospace; display:block; margin-bottom:2px; }
+  .sem-header{ border-color:var(--amber); color:#92400e; background:#fffbeb; }
+  .sem-nav{ border-color:var(--cyan); color:#155e75; background:#ecfeff; }
+  .sem-main{ border-color:#a78bfa; color:#5b21b6; background:#f5f3ff; display:flex; flex-direction:column; gap:6px; }
+  .sem-section{ border-color:var(--green); color:#065f46; background:#ecfdf5; }
+  .sem-footer{ border-color:var(--pink); color:#9d174d; background:#fdf2f8; }
+
+  /* counter */
+  .counter-display{ font-size:56px; font-weight:800; text-align:center; color:var(--ink); font-family:'Consolas',monospace; }
+  .counter-controls{ display:flex; gap:10px; justify-content:center; }
+
+  /* dom demo */
+  #domHeading{ font-size:22px; font-weight:700; transition:color .2s ease; }
+  #domPara{ color:#475569; font-size:13.5px; }
+
+  /* events demo */
+  .hover-box{
+    padding:24px; border-radius:10px; text-align:center;
+    background:var(--ink); color:#fff; font-weight:600; font-size:14px;
+    transition:background .2s ease;
+  }
+  .key-display{ font-family:'Consolas',monospace; font-size:14px; background:var(--ink); color:var(--green); padding:10px 12px; border-radius:8px; }
+
+  footer.site-footer{
+    text-align:center; padding:36px 24px; color:var(--mute); font-size:12.5px;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Live demo</div>
+    <h1 class="title">HTML &amp; JavaScript, in action</h1>
+    <p class="subtitle">Every concept from the presentation, running live in this page. Click things, type in things, watch the code and the result side by side.</p>
+  </div>
+  <nav class="pills">
+    <a href="#html-basics">HTML basics</a>
+    <a href="#html-forms">Forms</a>
+    <a href="#semantic">Semantic tags</a>
+    <a href="#js-variables">Variables</a>
+    <a href="#control-flow">Control flow</a>
+    <a href="#dom">DOM</a>
+    <a href="#events">Events</a>
+    <a href="#counter">Putting it together</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- 1. HTML BASICS -->
+  <section class="demo" id="html-basics">
+    <div class="kicker">01 · HTML Basics</div>
+    <h2>Tags &amp; common elements</h2>
+    <p class="desc">These are the elements from the slides, rendered for real. The code on the left is exactly what produced the result on the right.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">basics.html</span></div>
+        <pre><span class="tag">&lt;h1&gt;</span>Hello, world!<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;p&gt;</span>This is a paragraph.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;a </span><span class="attr">href</span>=<span class="str">"#"</span><span class="tag">&gt;</span>A link<span class="tag">&lt;/a&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span>List item one<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span>List item two<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;button&gt;</span>Click me<span class="tag">&lt;/button&gt;</span></pre>
+      </div>
+      <div class="panel">
+        <h4>Rendered result</h4>
+        <h1 style="font-size:22px;margin:0;">Hello, world!</h1>
+        <p style="margin:0;color:#475569;font-size:13.5px;">This is a paragraph.</p>
+        <a href="#" style="color:var(--amber);font-size:13.5px;">A link</a>
+        <ul style="margin:0;padding-left:20px;font-size:13.5px;color:#334155;">
+          <li>List item one</li>
+          <li>List item two</li>
+        </ul>
+        <button class="btn" onclick="alert('Button clicked!')">Click me</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. FORMS -->
+  <section class="demo" id="html-forms">
+    <div class="kicker">02 · HTML Intermediate</div>
+    <h2>A working form</h2>
+    <p class="desc">Forms collect input. Submitting this one doesn't reload the page — JavaScript intercepts the submit event and reads the values instead.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">form.html</span></div>
+        <pre><span class="tag">&lt;form </span><span class="attr">id</span>=<span class="str">"demoForm"</span><span class="tag">&gt;</span>
+  <span class="tag">&lt;label&gt;</span>Name<span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input </span><span class="attr">type</span>=<span class="str">"text"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;label&gt;</span>Email<span class="tag">&lt;/label&gt;</span>
+  <span class="tag">&lt;input </span><span class="attr">type</span>=<span class="str">"email"</span><span class="tag">&gt;</span>
+
+  <span class="tag">&lt;button </span><span class="attr">type</span>=<span class="str">"submit"</span><span class="tag">&gt;</span>Send<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/form&gt;</span></pre>
+      </div>
+      <div class="panel">
+        <h4>Try it</h4>
+        <form id="demoForm" style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <label class="field-label">Name</label>
+            <input class="field" type="text" id="nameField" placeholder="Jeff Pais" required>
+          </div>
+          <div>
+            <label class="field-label">Email</label>
+            <input class="field" type="email" id="emailField" placeholder="jeff@example.com" required>
+          </div>
+          <button class="btn" type="submit" style="align-self:flex-start;">Send</button>
+        </form>
+        <div class="console" id="formOutput"><div class="line empty">Submitted values will show here…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SEMANTIC TAGS -->
+  <section class="demo" id="semantic">
+    <div class="kicker">03 · HTML Intermediate</div>
+    <h2>Semantic layout</h2>
+    <p class="desc">Semantic tags describe what a section <em>is</em>, not just how it's boxed. Here's how a page's landmarks map onto real tags.</p>
+    <div class="sem-map">
+      <div class="sem-block sem-header"><b>&lt;header&gt;</b>Site banner / intro area</div>
+      <div class="sem-block sem-nav"><b>&lt;nav&gt;</b>Navigation links</div>
+      <div class="sem-block sem-main">
+        <b>&lt;main&gt;</b>
+        <div class="sem-block sem-section"><b>&lt;section&gt;</b>A thematic grouping of content</div>
+        <div class="sem-block sem-section"><b>&lt;article&gt;</b>Self-contained content, like a blog post</div>
+      </div>
+      <div class="sem-block sem-footer"><b>&lt;footer&gt;</b>Bottom info / credits</div>
+    </div>
+  </section>
+
+  <!-- 4. JS VARIABLES & DATA TYPES -->
+  <section class="demo" id="js-variables">
+    <div class="kicker">04 · JavaScript Basics</div>
+    <h2>Variables &amp; data types</h2>
+    <p class="desc">Run this snippet and watch it execute, line by line, in a simulated console.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">variables.js</span></div>
+        <pre><span class="kw">const</span> name = <span class="str">"Jeff"</span>;
+<span class="kw">let</span> age = <span style="color:var(--amber)">22</span>;
+<span class="kw">const</span> isGraduate = <span class="kw">true</span>;
+<span class="kw">const</span> skills = [<span class="str">"HTML"</span>, <span class="str">"CSS"</span>, <span class="str">"JS"</span>];
+
+console.log(<span class="kw">typeof</span> name);   <span class="cmt">// "string"</span>
+console.log(<span class="kw">typeof</span> age);    <span class="cmt">// "number"</span>
+console.log(<span class="kw">typeof</span> isGraduate); <span class="cmt">// "boolean"</span></pre>
+      </div>
+      <div class="panel">
+        <h4>Console</h4>
+        <div class="console" id="varsConsole"><div class="line empty">Click "Run" to execute…</div></div>
+        <button class="btn" onclick="runVariablesDemo()">▶ Run</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CONTROL FLOW -->
+  <section class="demo" id="control-flow">
+    <div class="kicker">05 · JS Control Flow</div>
+    <h2>Functions, conditionals &amp; loops</h2>
+    <p class="desc">Enter a score and run it — the function decides pass/fail, then a loop counts up to it.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">flow.js</span></div>
+        <pre><span class="kw">function</span> checkScore(score) {
+  <span class="kw">if</span> (score &gt;= 60) {
+    <span class="kw">return</span> <span class="str">"Pass"</span>;
+  } <span class="kw">else</span> {
+    <span class="kw">return</span> <span class="str">"Fail"</span>;
+  }
+}
+
+<span class="kw">for</span> (<span class="kw">let</span> i = 1; i &lt;= score; i += 20) {
+  console.log(<span class="str">"Progress:"</span>, i);
+}</pre>
+      </div>
+      <div class="panel">
+        <h4>Try it</h4>
+        <div>
+          <label class="field-label">Score (0–100)</label>
+          <input class="field" type="number" id="scoreField" value="75" min="0" max="100">
+        </div>
+        <button class="btn" onclick="runControlFlowDemo()">▶ Run</button>
+        <div class="console" id="flowConsole"><div class="line empty">Output will appear here…</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. DOM -->
+  <section class="demo" id="dom">
+    <div class="kicker">06 · JavaScript Intermediate</div>
+    <h2>DOM manipulation</h2>
+    <p class="desc">These buttons run real <code>document.getElementById</code> and <code>textContent</code> / <code>style</code> calls on the heading below.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">dom.js</span></div>
+        <pre><span class="kw">const</span> heading = document.getElementById(<span class="str">"domHeading"</span>);
+
+heading.textContent = <span class="str">"New text!"</span>;
+heading.style.color = <span class="str">"#f59e0b"</span>;</pre>
+      </div>
+      <div class="panel">
+        <h4>Live element</h4>
+        <div id="domHeading">Original heading text</div>
+        <p id="domPara">This paragraph doesn't change — only the heading does.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn" onclick="document.getElementById('domHeading').textContent='The DOM just updated this!'">Change text</button>
+          <button class="btn secondary" onclick="document.getElementById('domHeading').style.color='#f59e0b'">Amber</button>
+          <button class="btn secondary" onclick="document.getElementById('domHeading').style.color='#22d3ee'">Cyan</button>
+          <button class="btn secondary" onclick="resetDom()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. EVENTS -->
+  <section class="demo" id="events">
+    <div class="kicker">07 · JavaScript Intermediate</div>
+    <h2>Events</h2>
+    <p class="desc">Three common listeners: click, mouseover, and keydown — each wired with <code>addEventListener</code>.</p>
+    <div class="grid">
+      <div class="panel">
+        <h4>click</h4>
+        <button class="btn" id="clickBtn">Click me — 0</button>
+      </div>
+      <div class="panel">
+        <h4>mouseover</h4>
+        <div class="hover-box" id="hoverBox">Hover over me</div>
+      </div>
+      <div class="panel" style="flex-basis:100%;">
+        <h4>keydown</h4>
+        <input class="field" id="keyField" placeholder="Type here…">
+        <div class="key-display" id="keyDisplay">Last key: —</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. PUTTING IT TOGETHER -->
+  <section class="demo" id="counter">
+    <div class="kicker">08 · Putting It Together</div>
+    <h2>A tiny interactive counter</h2>
+    <p class="desc">Variables, DOM selection, and event listeners, combined — exactly like the closing example from the slides.</p>
+    <div class="grid">
+      <div class="code-box">
+        <div class="bar"><span class="r"></span><span class="y"></span><span class="g"></span><span class="label">counter.js</span></div>
+        <pre><span class="kw">let</span> count = <span style="color:var(--amber)">0</span>;
+<span class="kw">const</span> display = document.getElementById(<span class="str">"count"</span>);
+
+addBtn.addEventListener(<span class="str">"click"</span>, () =&gt; {
+  count++;
+  display.textContent = count;
+});</pre>
+      </div>
+      <div class="panel">
+        <div class="counter-display" id="counterDisplay">0</div>
+        <div class="counter-controls">
+          <button class="btn secondary" onclick="changeCounter(-1)">−1</button>
+          <button class="btn secondary" onclick="resetCounter()">Reset</button>
+          <button class="btn" onclick="changeCounter(1)">+1</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">Built to accompany "Web Development Fundamentals" — HTML &amp; JavaScript, basic to intermediate.</footer>
+
+<script>
+  // ---------- 2. Form ----------
+  document.getElementById('demoForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    const name = document.getElementById('nameField').value || '(empty)';
+    const email = document.getElementById('emailField').value || '(empty)';
+    const out = document.getElementById('formOutput');
+    out.innerHTML =
+      '<div class="line"><span class="arrow">→</span> name: "' + name + '"</div>' +
+      '<div class="line"><span class="arrow">→</span> email: "' + email + '"</div>' +
+      '<div class="line"><span class="arrow">→</span> page did NOT reload ✓</div>';
+  });
+
+  // ---------- 4. Variables & data types ----------
+  function runVariablesDemo(){
+    const name = "Jeff";
+    let age = 22;
+    const isGraduate = true;
+    const skills = ["HTML", "CSS", "JS"];
+    const lines = [
+      'const name = "Jeff";',
+      'let age = 22;',
+      'const isGraduate = true;',
+      'const skills = ["HTML","CSS","JS"];',
+      'typeof name  →  "' + (typeof name) + '"',
+      'typeof age   →  "' + (typeof age) + '"',
+      'typeof isGraduate  →  "' + (typeof isGraduate) + '"',
+      'skills.length  →  ' + skills.length,
+    ];
+    printConsole('varsConsole', lines);
+  }
+
+  // ---------- 5. Control flow ----------
+  function runControlFlowDemo(){
+    const score = Number(document.getElementById('scoreField').value);
+    function checkScore(s){ return s >= 60 ? "Pass" : "Fail"; }
+    const result = checkScore(score);
+    const lines = ['checkScore(' + score + ') → "' + result + '"', '— loop —'];
+    for (let i = 20; i <= score; i += 20){
+      lines.push('Progress: ' + i);
+    }
+    printConsole('flowConsole', lines);
+  }
+
+  function printConsole(id, lines){
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    lines.forEach((l, i) => {
+      setTimeout(() => {
+        const div = document.createElement('div');
+        div.className = 'line';
+        div.innerHTML = '<span class="arrow">→</span> ' + l;
+        el.appendChild(div);
+        el.scrollTop = el.scrollHeight;
+      }, i * 140);
+    });
+  }
+
+  // ---------- 6. DOM ----------
+  function resetDom(){
+    const h = document.getElementById('domHeading');
+    h.textContent = 'Original heading text';
+    h.style.color = '#0f172a';
+  }
+
+  // ---------- 7. Events ----------
+  let clickCount = 0;
+  const clickBtn = document.getElementById('clickBtn');
+  clickBtn.addEventListener('click', () => {
+    clickCount++;
+    clickBtn.textContent = 'Click me — ' + clickCount;
+  });
+
+  const hoverBox = document.getElementById('hoverBox');
+  hoverBox.addEventListener('mouseover', () => {
+    hoverBox.style.background = '#f59e0b';
+    hoverBox.style.color = '#1e293b';
+    hoverBox.textContent = 'mouseover fired!';
+  });
+  hoverBox.addEventListener('mouseout', () => {
+    hoverBox.style.background = '#0f172a';
+    hoverBox.style.color = '#fff';
+    hoverBox.textContent = 'Hover over me';
+  });
+
+  document.getElementById('keyField').addEventListener('keydown', (e) => {
+    document.getElementById('keyDisplay').textContent = 'Last key: ' + e.key;
+  });
+
+  // ---------- 8. Counter ----------
+  let count = 0;
+  const counterDisplay = document.getElementById('counterDisplay');
+  function changeCounter(delta){
+    count += delta;
+    counterDisplay.textContent = count;
+  }
+  function resetCounter(){
+    count = 0;
+    counterDisplay.textContent = count;
+  }
+</script>
+
+</body>
+</html>
